@@ -1,4 +1,13 @@
-package atmController
+package atmcontroller
+
+const (
+	ViewerEventCardAttached   ViewerEventType  = "event_card_attached"
+	ViewerEventActionSelected ViewerEventType  = "event_action_selected"
+	ViewerEventEndTransaction ViewerEventType  = "event_end_transaction"
+	ViewerActionBalance       ViewerActionType = "action_balance"
+	ViewerActionDeposit       ViewerActionType = "action_deposit"
+	ViewerActionWithdraw      ViewerActionType = "action_withdraw"
+)
 
 type (
 	// Card is container of card information
@@ -24,20 +33,35 @@ type (
 	// AtmContainer transfer information with bank thorough this interface.
 	AtmModel interface {
 		Init() error
-		CardVerify(Card, int) error
-		AccountBalance(Account) (error, int)
-		AccountDeposit(Account, int) error
-		AccountWithdraw(Account, int) error
+		AccountBalance(target Account, auth CardAuth) (error, int)
+		AccountDeposit(target Account, auth CardAuth, amount int) error
+		AccountWithdraw(target Account, auth CardAuth, amount int) error
+		CardAccount(target Card, auth CardAuth) (error, []Account)
+		CardVerify(target Card, pin int) (error, CardAuth)
 	}
 
+	ViewerEventType  string
+	ViewerActionType string
+
 	// ViewerEventCallbackFunc is callback function's signature definition
-	ViewerEventCallbackFunc func(eventName string, params interface{}) error
+	ViewerEventCallbackFunc func(eventName ViewerEventType, params interface{}) interface{}
+
+	ViewerEventCardParam struct {
+		Card Card
+		Pin  int
+	}
+	ViewerEventActionParam struct {
+		Account Account
+		Action  ViewerActionType
+		Amount  int
+	}
 
 	// AtmViewer is part of atm which interact between atm and user.
 	// Event callback is called when user operates this atm or some specific events caused.
 	AtmViewer interface {
-		Init() error
+		Init()
 		SetEventCallback(ViewerEventCallbackFunc)
+		Panic(error)
 	}
 
 	// AtmCashBin is part of atm which maintain real cash and recieve and emit real cash between user.
@@ -52,10 +76,6 @@ type (
 	// This control every other part of atm.
 	AtmController interface {
 		Init(viewer *AtmViewer, model *AtmModel, cashbin *AtmCashBin)
-		AccountBalance(target Account, auth CardAuth) (error, int)
-		AccountDeposit(target Account, auth CardAuth, amount int) error
-		AccountWithdraw(target Account, auth CardAuth, amount int) error
-		CardAccount(target Card, auth CardAuth) (error, []Account)
-		CardVerify(pin int) (error, CardAuth)
+		ViewerEventCallback(eventName ViewerEventType, params interface{}) interface{}
 	}
 )

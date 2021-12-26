@@ -1,3 +1,3 @@
-module github.com/dictor/bearrobo-atm/atmController
+module atmcontroller
 
 go 1.17
