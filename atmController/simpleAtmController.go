@@ -16,6 +16,7 @@ func (c *SimpleAtmController) Init(viewer AtmViewer, model AtmModel, cashbin Atm
 	c.cashbin = cashbin
 
 	c.viewer.Init()
+	c.viewer.SetEventCallback(c.ViewerEventCallback)
 	if err := c.model.Init(); err != nil {
 		c.viewer.Panic(err)
 	}
