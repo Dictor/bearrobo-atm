@@ -27,9 +27,9 @@ func (cb *SimpleAtmCashbin) RecieveCash() (error, int) {
 	return nil, amount
 }
 
-func (cb *SimpleAtmCashbin) EmitCash(int) error {
+func (cb *SimpleAtmCashbin) EmitCash(amount int) error {
 	fmt.Println("[SimpleAtmCashbin] cashbin opened")
-	fmt.Println("[SimpleAtmCashbin] enter after get cash")
+	fmt.Printf("[SimpleAtmCashbin] enter after get %d dollars\n", amount)
 	fmt.Scanln()
 	fmt.Println("[SimpleAtmCashbin] cashbin closed")
 	return nil
