@@ -85,9 +85,22 @@ func (c *SimpleAtmController) ViewerEventCallback(eventType ViewerEventType, par
 			}
 			return bal
 		case ViewerActionDeposit:
-			return c.model.AccountDeposit(ap.Account, *c.currentAuth, ap.Amount)
+			err, ramo := c.cashbin.RecieveCash()
+			if err != nil {
+				return err
+			}
+			if err := c.model.AccountDeposit(ap.Account, *c.currentAuth, ramo); err != nil {
+				return err
+			}
+			return nil
 		case ViewerActionWithdraw:
-			return c.model.AccountWithdraw(ap.Account, *c.currentAuth, ap.Amount)
+			if c.cashbin.Balance() < ap.Amount {
+				return fmt.Errorf("atm has insufficient cash")
+			}
+			if err := c.model.AccountWithdraw(ap.Account, *c.currentAuth, ap.Amount); err != nil {
+				return err
+			}
+			return c.cashbin.EmitCash(ap.Amount)
 		}
 	}
 	return typeError
