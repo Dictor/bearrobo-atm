@@ -83,6 +83,9 @@ func (am *SimpleAtmModel) AccountWithdraw(target atmcontroller.Account, auth atm
 	if err := am.findAccount(target); err != nil {
 		return err
 	}
+	if amount > am.account[target.Number] {
+		return fmt.Errorf("account balance insuffcient")
+	}
 	am.account[target.Number] -= amount
 	return nil
 }
