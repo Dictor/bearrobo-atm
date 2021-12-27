@@ -49,6 +49,7 @@ func (c *SimpleAtmController) ViewerEventCallback(eventType ViewerEventType, par
 		if err != nil {
 			return err
 		}
+		c.currentAuth = &auth
 
 		// retrieve accounts
 		err, accounts := c.model.CardAccount(cp.Card, auth)
