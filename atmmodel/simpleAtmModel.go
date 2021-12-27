@@ -19,12 +19,14 @@ type (
 func (am *SimpleAtmModel) Init() error {
 	am.accountToCard = map[string]string{
 		"123123123123": "1234123412341234",
+		"345345345345": "1234123412341234",
 	}
 	am.cardPin = map[string]int{
 		"1234123412341234": 1234,
 	}
 	am.account = map[string]int{
 		"123123123123": 100,
+		"345345345345": 50,
 	}
 	return nil
 }
