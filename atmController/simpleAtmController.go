@@ -10,7 +10,6 @@ type SimpleAtmController struct {
 }
 
 func (c *SimpleAtmController) Init(viewer AtmViewer, model AtmModel, cashbin AtmCashBin) {
-	fmt.Println("[SimpleAtmController] Init")
 	c.viewer = viewer
 	c.model = model
 	c.cashbin = cashbin

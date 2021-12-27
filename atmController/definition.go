@@ -12,7 +12,7 @@ const (
 type (
 	// Card is container of card information
 	Card struct {
-		Number      []int
+		Number      string
 		OwnerName   string
 		ExpireYear  int
 		ExpireMonth int
@@ -26,7 +26,7 @@ type (
 
 	// Account is conatiner of account information
 	Account struct {
-		Number []int
+		Number string
 	}
 
 	// AtmModel is connector between this atm and bank.
