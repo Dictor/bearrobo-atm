@@ -3,7 +3,7 @@ package atmviewer
 import (
 	"fmt"
 
-	"github.com/AlecAivazis/survey/v2"
+	survey "github.com/AlecAivazis/survey/v2"
 	"github.com/dictor/bearrobo-atm/atmcontroller"
 )
 
