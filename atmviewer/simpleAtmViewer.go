@@ -56,7 +56,7 @@ func (av *ConsoleAtmViewer) SetEventCallback(cb atmcontroller.ViewerEventCallbac
 
 			if av.cardNumber == "" {
 				fmt.Println("[ConsoleAtmViewer] Card detached.")
-				return
+				continue
 			}
 			fmt.Println("[ConsoleAtmViewer] Card attached.")
 
