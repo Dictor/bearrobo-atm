@@ -103,9 +103,9 @@ func (av *ConsoleAtmViewer) SetEventCallback(cb atmcontroller.ViewerEventCallbac
 				Action:  selectionToAction[actionSel],
 				Amount:  0,
 			}
-			if actionSel != 0 {
+			if actionSel == 1 {
 				survey.AskOne(&survey.Input{
-					Message: "Enter amount for withdraw or deposit : ",
+					Message: "Enter amount for withdraw : ",
 				}, &actionParam.Amount)
 			}
 			ret = cb(atmcontroller.ViewerEventActionSelected, actionParam)
