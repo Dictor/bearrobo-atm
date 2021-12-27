@@ -46,75 +46,77 @@ func (av *ConsoleAtmViewer) Init() {
 
 func (av *ConsoleAtmViewer) SetEventCallback(cb atmcontroller.ViewerEventCallbackFunc) {
 	go func() {
-		survey.AskOne(&survey.Input{
-			Message: "Enter your card number : ",
-		}, &av.cardNumber)
-		survey.AskOne(&survey.Input{
-			Message: "Enter your card PIN : ",
-		}, &av.cardPin)
+		for {
+			survey.AskOne(&survey.Input{
+				Message: "Enter your card number : ",
+			}, &av.cardNumber)
+			survey.AskOne(&survey.Input{
+				Message: "Enter your card PIN : ",
+			}, &av.cardPin)
 
-		if av.cardNumber == "" {
-			fmt.Println("[ConsoleAtmViewer] Card detached.")
-			return
-		}
-		fmt.Println("[ConsoleAtmViewer] Card attached.")
+			if av.cardNumber == "" {
+				fmt.Println("[ConsoleAtmViewer] Card detached.")
+				return
+			}
+			fmt.Println("[ConsoleAtmViewer] Card attached.")
 
-		ret := cb(atmcontroller.ViewerEventCardAttached, atmcontroller.ViewerEventCardParam{
-			Card: atmcontroller.Card{
-				Number:      av.cardNumber,
-				OwnerName:   "TEST OWNER",
-				ExpireYear:  2022,
-				ExpireMonth: 01,
-				CVC:         123,
-			},
-			Pin: av.cardPin,
-		})
-
-		switch ret.(type) {
-		case error:
-			fmt.Printf("[ConsoleAtmViewer] Error caused during process: %s\n", ret)
-			return
-		case []atmcontroller.Account:
-			var (
-				accountSel        int
-				actionSel         int
-				selectionToAction []atmcontroller.ViewerActionType = []atmcontroller.ViewerActionType{
-					atmcontroller.ViewerActionBalance,
-					atmcontroller.ViewerActionWithdraw,
-					atmcontroller.ViewerActionDeposit,
-				}
-			)
-			accounts := ret.([]atmcontroller.Account)
-			prompt := &survey.Select{
-				Message: "Choose a account :",
-				Options: []string{},
-			}
-			for _, a := range accounts {
-				prompt.Options = append(prompt.Options, a.Number)
-			}
-			survey.AskOne(prompt, &accountSel)
-			survey.AskOne(&survey.Select{
-				Message: "Choose an action for account :",
-				Options: []string{"balance", "withdraw", "deposit"},
-			}, &actionSel)
-
-			actionParam := atmcontroller.ViewerEventActionParam{
-				Account: accounts[accountSel],
-				Action:  selectionToAction[actionSel],
-				Amount:  0,
-			}
-			if actionSel == 1 {
-				survey.AskOne(&survey.Input{
-					Message: "Enter amount for withdraw : ",
-				}, &actionParam.Amount)
-			}
-			ret = cb(atmcontroller.ViewerEventActionSelected, actionParam)
+			ret := cb(atmcontroller.ViewerEventCardAttached, atmcontroller.ViewerEventCardParam{
+				Card: atmcontroller.Card{
+					Number:      av.cardNumber,
+					OwnerName:   "TEST OWNER",
+					ExpireYear:  2022,
+					ExpireMonth: 01,
+					CVC:         123,
+				},
+				Pin: av.cardPin,
+			})
 
 			switch ret.(type) {
 			case error:
 				fmt.Printf("[ConsoleAtmViewer] Error caused during process: %s\n", ret)
-			case int:
-				fmt.Printf("[ConsoleAtmViewer] Result: %d dollar\n", ret)
+				continue
+			case []atmcontroller.Account:
+				var (
+					accountSel        int
+					actionSel         int
+					selectionToAction []atmcontroller.ViewerActionType = []atmcontroller.ViewerActionType{
+						atmcontroller.ViewerActionBalance,
+						atmcontroller.ViewerActionWithdraw,
+						atmcontroller.ViewerActionDeposit,
+					}
+				)
+				accounts := ret.([]atmcontroller.Account)
+				prompt := &survey.Select{
+					Message: "Choose a account :",
+					Options: []string{},
+				}
+				for _, a := range accounts {
+					prompt.Options = append(prompt.Options, a.Number)
+				}
+				survey.AskOne(prompt, &accountSel)
+				survey.AskOne(&survey.Select{
+					Message: "Choose an action for account :",
+					Options: []string{"balance", "withdraw", "deposit"},
+				}, &actionSel)
+
+				actionParam := atmcontroller.ViewerEventActionParam{
+					Account: accounts[accountSel],
+					Action:  selectionToAction[actionSel],
+					Amount:  0,
+				}
+				if actionSel == 1 {
+					survey.AskOne(&survey.Input{
+						Message: "Enter amount for withdraw : ",
+					}, &actionParam.Amount)
+				}
+				ret = cb(atmcontroller.ViewerEventActionSelected, actionParam)
+
+				switch ret.(type) {
+				case error:
+					fmt.Printf("[ConsoleAtmViewer] Error caused during process: %s\n", ret)
+				case int:
+					fmt.Printf("[ConsoleAtmViewer] Result: %d dollar\n", ret)
+				}
 			}
 		}
 	}()
